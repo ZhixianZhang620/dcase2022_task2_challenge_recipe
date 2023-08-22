@@ -9,14 +9,14 @@ valid_ratio=0.15
 use_norm=""   #_norm: Normalize feature in training anomalous detector at stage 5.
 inlier_scp="" #"": using only validation data or "_dev": using all training data
 use_target_in_embed=true
-epochs="250 300"
+epochs="50 100 150 200 250 300"
 # shellcheck disable=SC1091
 . utils/parse_options.sh || exit 1
 
 set -euo pipefail
 
 # machines=("fan" "gearbox" "bearing" "valve" "slider" "ToyCar" "ToyTrain")
-machines=("fan")
+machines=("ToyTrain")
 resume=""
 tag=${no}
 if [ "${stage}" -le 1 ] && [ "${stage}" -ge 1 ]; then
@@ -26,7 +26,7 @@ if [ "${stage}" -le 1 ] && [ "${stage}" -ge 1 ]; then
             inlier_scp="dump/dev/${machine}/train/dev.scp"
         fi
         echo "Start model training ${machine}/${no}. resume:${resume}, inlier_scp:${inlier_scp}"
-        ./run.sh \
+        ./run-6.sh \
             --stage "${start_stage}" \
             --stop_stage "5" \
             --conf "conf/tuning/asd_model.${no}.yaml" \

@@ -9,17 +9,64 @@ import argparse
 import logging
 import os
 import json
+import h5py
+
 
 import librosa
 import numpy as np
 
 from tqdm import tqdm
 
-from asd_tools.utils import write_hdf5
+# from asd_tools.utils import utils#write_hdf5
 
+def write_hdf5(hdf5_name, hdf5_path, write_data, is_overwrite=True):
+    """Write dataset to hdf5.
+
+    Args:
+        hdf5_name (str): Hdf5 dataset filename.
+        hdf5_path (str): Dataset path in hdf5.
+        write_data (ndarray): Data to write.
+        is_overwrite (bool): Whether to overwrite dataset.
+
+    """
+    # convert to numpy array
+    write_data = np.array(write_data)
+
+    # check folder existence
+    folder_name, _ = os.path.split(hdf5_name)
+    if not os.path.exists(folder_name) and len(folder_name) != 0:
+        os.makedirs(folder_name)
+
+    # check hdf5 existence
+    if os.path.exists(hdf5_name):
+        # if already exists, open with r+ mode
+        hdf5_file = h5py.File(hdf5_name, "r+")
+        # check dataset existence
+        if hdf5_path in hdf5_file:
+            if is_overwrite:
+                logging.warning(
+                    "Dataset in hdf5 file already exists. " "recreate dataset in hdf5."
+                )
+                hdf5_file.__delitem__(hdf5_path)
+            else:
+                logging.error(
+                    "Dataset in hdf5 file already exists. "
+                    "if you want to overwrite, please set is_overwrite = True."
+                )
+                hdf5_file.close()
+                sys.exit(1)
+    else:
+        # if not exists, open with w mode
+        hdf5_file = h5py.File(hdf5_name, "w")
+
+    # write data to hdf5
+    hdf5_file.create_dataset(hdf5_path, data=write_data)
+    hdf5_file.flush()
+    hdf5_file.close()
 
 def main():
     """Run preprocessing process."""
+    print("Test!!!!")
     parser = argparse.ArgumentParser(
         description="Preprocess audio and then extract features."
     )

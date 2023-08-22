@@ -33,7 +33,7 @@ use_target_in_embed=true
 . utils/parse_options.sh || exit 1
 set -euo pipefail
 
-echo "Start run.sh"
+echo "Start run-2.sh"
 machines=("bearing" "fan" "gearbox" "valve" "slider" "ToyTrain" "ToyCar")
 if [ "${pos_machine}" = "bearing" ]; then
     neg_machines=("fan" "gearbox" "valve" "slider" "ToyTrain" "ToyCar")
@@ -117,7 +117,7 @@ if [ "${stage}" -le 3 ] && [ "${stop_stage}" -ge 3 ]; then
     echo "Training start. See the progress via ${outdir}/train_${pos_machine}_${tag}.log."
     # shellcheck disable=SC2154,SC2086
     ${cuda_cmd} --gpu "${n_gpus}" "${outdir}/train_${pos_machine}_${tag}.log" \
-        python -m asd_tools.bin.train \
+        python -m asd_tools.bin.train3 \
         --pos_machine "${pos_machine}" \
         --train_pos_machine_scp "${dumpdir}/dev/${pos_machine}/train/train${end_str}.scp" \
         --train_neg_machine_scps ${train_neg_machine_scps} \
@@ -150,7 +150,7 @@ if [ "${stage}" -le 4 ] && [ "${stop_stage}" -ge 4 ]; then
     echo "Stage 4: Embedding calculation start. See the progress via ${outdir}/embed_${pos_machine}${tail_name}.log."
     # shellcheck disable=SC2154,SC2086
     ${cuda_cmd} --gpu "${n_gpus}" "${outdir}/embed_${pos_machine}${tag}${tail_name}.log" \
-        python -m asd_tools.bin.embed \
+        python -m asd_tools.bin.embed3 \
         --valid_pos_machine_scp "${inlier_scp}" \
         --eval_pos_machine_scp "${dumpdir}/dev/${pos_machine}/test/eval.scp" \
         --checkpoints ${checkpoints} \
@@ -165,7 +165,7 @@ if [ "${stage}" -le 5 ] && [ "${stop_stage}" -ge 5 ]; then
     echo "Stage 5: Inference start. See the progress via ${outdir}/infer_${pos_machine}${feature}${tail_name}${use_norm}.log."
     # shellcheck disable=SC2154,SC2086
     ${cuda_cmd} "${outdir}/infer_${pos_machine}${tag}${feature}${tail_name}${use_norm}.log" \
-        python -m asd_tools.bin.infer \
+        python -m asd_tools.bin.infer3 \
         --checkpoints ${checkpoints} \
         --config "${conf}" \
         --feature "${feature}" \

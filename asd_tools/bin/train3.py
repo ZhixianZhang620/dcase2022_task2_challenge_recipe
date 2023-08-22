@@ -107,7 +107,7 @@ def main():
 
     args.distributed = False
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = "1"
+    os.environ['CUDA_VISIBLE_DEVICES'] = "7"
     if torch.cuda.is_available():
         device = torch.device("cuda")
     else:
